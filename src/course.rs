@@ -2,6 +2,7 @@ use crate::*;
 
 #[derive(BorshDeserialize, BorshSerialize)]
 pub struct Course {
+    pub id: u32,
     pub name: String,
     pub level: u32,
     pub luck: u32,
