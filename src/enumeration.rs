@@ -2,7 +2,6 @@ use crate::*;
 
 #[near_bindgen]
 impl Contract {
-
     pub fn course_info(&self, course_id: CourseId) -> Option<Course> {
         let courses = self.courses.to_vec().clone();
         let course = courses.iter().find(|&x| x.course_id == course_id);
@@ -10,9 +9,10 @@ impl Contract {
         if let Some(course) = course {
             let metadata = self.course_metadata_by_id.get(&course_id).unwrap();
             Some(Course {
-                contributor_id: AccountId::try_from(course.contributor_id.to_string().clone()).unwrap(),
+                contributor_id: AccountId::try_from(course.contributor_id.to_string().clone())
+                    .unwrap(),
                 course_id,
-                metadata
+                metadata,
             })
         } else {
             None
@@ -27,11 +27,12 @@ impl Contract {
         let course_keys = self.course_metadata_by_id.keys_as_vector();
         let start = u128::from(from_index.unwrap_or(U128(0)));
 
-        course_keys.iter()
-        .skip(start as usize)
-        .take(limit.unwrap_or(0) as usize)
-        .map(|course_id| self.course_info(course_id).unwrap())
-        .collect()
+        course_keys
+            .iter()
+            .skip(start as usize)
+            .take(limit.unwrap_or(0) as usize)
+            .map(|course_id| self.course_info(course_id).unwrap())
+            .collect()
     }
 
     pub fn courses_for_user(
@@ -50,11 +51,21 @@ impl Contract {
 
         let start = u128::from(from_index.unwrap_or(U128(0)));
 
-        courses.as_vector()
+        courses
+            .as_vector()
             .iter()
             .skip(start as usize)
             .take(limit.unwrap_or(0) as usize)
             .collect()
+    }
+
+    pub fn total_courses_for_user(&self, account_id: AccountId) -> U128 {
+        let courses_for_user_set = self.courses_by_user.get(&account_id);
+        if let Some(courses_for_user_set) = courses_for_user_set {
+            U128(courses_for_user_set.len() as u128)
+        } else {
+            U128(0)
+        }
     }
 
     pub fn courses_for_contributor(
@@ -73,10 +84,20 @@ impl Contract {
 
         let start = u128::from(from_index.unwrap_or(U128(0)));
 
-        courses.as_vector()
+        courses
+            .as_vector()
             .iter()
             .skip(start as usize)
             .take(limit.unwrap_or(0) as usize)
             .collect()
+    }
+
+    pub fn total_courses_for_contributor(&self, account_id: AccountId) -> U128 {
+        let courses_for_contributor_set = self.courses_by_contributor.get(&account_id);
+        if let Some(courses_for_contributor_set) = courses_for_contributor_set {
+            U128(courses_for_contributor_set.len() as u128)
+        } else {
+            U128(0)
+        }
     }
 }

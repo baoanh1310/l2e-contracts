@@ -2,7 +2,6 @@ use crate::*;
 
 #[near_bindgen]
 impl Contract {
-
     #[payable]
     pub fn create_course(&mut self, course_metadata: CourseMetadata) {
         let contributor_id = env::predecessor_account_id();
@@ -11,11 +10,12 @@ impl Contract {
         let course = Course {
             contributor_id,
             course_id,
-            metadata: course_metadata.clone()
+            metadata: course_metadata.clone(),
         };
 
         // insert to course_metadata_by_id map
-        self.course_metadata_by_id.insert(&course_id, &course_metadata);
+        self.course_metadata_by_id
+            .insert(&course_id, &course_metadata);
 
         // insert to courses_by_contributor
         self.internal_add_course_to_contributor(&contributor_id_clone, &course);
@@ -24,7 +24,5 @@ impl Contract {
         self.courses.insert(&course);
     }
 
-    pub fn register_course(&mut self, user_id: AccountId, course_id: CourseId) {
-
-    }
+    pub fn register_course(&mut self, user_id: AccountId, course_id: CourseId) {}
 }

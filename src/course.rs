@@ -5,7 +5,7 @@ use crate::*;
 pub struct Course {
     pub contributor_id: AccountId,
     pub course_id: CourseId,
-    pub metadata: CourseMetadata
+    pub metadata: CourseMetadata,
 }
 
 #[derive(Deserialize, Serialize, BorshDeserialize, BorshSerialize, Clone, Debug)]
@@ -18,7 +18,7 @@ pub struct CourseMetadata {
     pub end_time: u64,
     pub current_date: u32,
     pub course_type_id: u32,
-    pub boxes: Vec<CustomBox>, 
+    pub boxes: Vec<CustomBox>,
 }
 
 #[derive(Deserialize, Serialize, BorshDeserialize, BorshSerialize, Clone, Debug)]
