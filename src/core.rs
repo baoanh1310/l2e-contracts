@@ -52,7 +52,7 @@ impl Contract {
             assert!(
                 amount >= price_in_yocto,
                 "Not enough NEAR to register this course. Price of this course: {} NEAR",
-                price_in_yocto
+                price_in_near
             );
             if amount > price_in_yocto {
                 let refund = amount - price_in_yocto;

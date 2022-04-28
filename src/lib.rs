@@ -86,6 +86,7 @@ mod tests {
 
     const CREATE_COURSE_DEPOSIT: u128 = 12420000000000000000000;
     const LEVEL1_PRICE: u128 = LEVEL_1 * ONE_YOCTO;
+    const LEVEL2_PRICE: u128 = LEVEL_2 * ONE_YOCTO;
 
     fn get_context(is_view: bool) -> VMContextBuilder {
         let mut builder = VMContextBuilder::new();
@@ -111,7 +112,7 @@ mod tests {
     fn get_default_metadata() -> CourseMetadata {
         CourseMetadata {
             name: "Rust".to_string(),
-            level: 1,
+            level: 2,
             luck: 1,
             start_time: 100000,
             end_time: 120000,
@@ -185,7 +186,7 @@ mod tests {
 
         testing_env!(context
             .storage_usage(env::storage_usage())
-            .attached_deposit(LEVEL1_PRICE + CREATE_COURSE_DEPOSIT)
+            .attached_deposit(LEVEL2_PRICE + CREATE_COURSE_DEPOSIT)
             .predecessor_account_id(accounts(0))
             .signer_account_id(accounts(0))
             .build());
