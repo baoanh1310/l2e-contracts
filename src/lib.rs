@@ -4,18 +4,20 @@ use near_sdk::json_types::{Base64VecU8, U128};
 use near_sdk::serde::{Deserialize, Serialize};
 use near_sdk::{
     env, ext_contract, log, near_bindgen, AccountId, Balance, BlockHeight, EpochHeight, Gas,
-    PanicOnDefault, PromiseOrValue, PromiseResult, Timestamp,
+    PanicOnDefault, PromiseOrValue, PromiseResult, Timestamp, Promise
 };
 
 use crate::core::*;
 use crate::course::*;
 use crate::enumeration::*;
 use crate::internal::*;
+use crate::utils::*;
 
 mod core;
 mod course;
 mod enumeration;
 mod internal;
+mod utils;
 
 pub type CourseId = u128;
 
@@ -73,6 +75,8 @@ mod tests {
     use super::*;
     use near_sdk::test_utils::{accounts, VMContextBuilder};
     use near_sdk::{testing_env, MockedBlockchain};
+
+    const CREATE_COURSE_DEPOSIT: u128 = 12420000000000000000000;
 
     fn get_context(is_view: bool) -> VMContextBuilder {
         let mut builder = VMContextBuilder::new();
@@ -144,11 +148,17 @@ mod tests {
 
     #[test]
     fn test_create_course() {
-        let context = get_context(false);
+        let mut context = get_context(false);
         testing_env!(context.build());
 
         let mut contract =
             Contract::new_default("main.l2e.testnet".to_string().try_into().unwrap());
+
+        testing_env!(
+            context.storage_usage(env::storage_usage())
+            .attached_deposit(CREATE_COURSE_DEPOSIT)
+            .build()
+        );
 
         contract.create_course(get_default_metadata());
         assert_eq!(contract.total_courses_count(), U128(1));

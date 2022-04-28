@@ -20,7 +20,7 @@ impl Contract {
     }
 
     pub fn total_courses_count(&self) -> U128 {
-        U128(self.course_metadata_by_id.len() as u128)
+        U128(self.courses.len() as u128)
     }
 
     pub fn total_courses(&self, from_index: Option<U128>, limit: Option<u64>) -> Vec<Course> {
