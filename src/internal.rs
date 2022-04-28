@@ -25,5 +25,4 @@ impl Contract {
         courses_set.insert(course);
         self.courses_by_user.insert(account_id, &courses_set);
     }
-
 }

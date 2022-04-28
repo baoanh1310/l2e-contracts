@@ -4,7 +4,7 @@ use near_sdk::json_types::{Base64VecU8, U128};
 use near_sdk::serde::{Deserialize, Serialize};
 use near_sdk::{
     env, ext_contract, log, near_bindgen, AccountId, Balance, BlockHeight, EpochHeight, Gas,
-    PanicOnDefault, PromiseOrValue, PromiseResult, Timestamp, Promise
+    PanicOnDefault, Promise, PromiseOrValue, PromiseResult, Timestamp,
 };
 
 use crate::core::*;
@@ -20,6 +20,14 @@ mod internal;
 mod utils;
 
 pub type CourseId = u128;
+
+pub const ONE_YOCTO: u128 = 1_000_000_000_000_000_000_000_000;
+pub const LEVEL_1: u128 = 5;
+pub const LEVEL_2: u128 = 10;
+pub const LEVEL_3: u128 = 15;
+pub const LEVEL_4: u128 = 20;
+pub const LEVEL_5: u128 = 25;
+pub const LEVEL_6: u128 = 30;
 
 #[near_bindgen]
 #[derive(BorshDeserialize, BorshSerialize, PanicOnDefault)]
@@ -77,6 +85,7 @@ mod tests {
     use near_sdk::{testing_env, MockedBlockchain};
 
     const CREATE_COURSE_DEPOSIT: u128 = 12420000000000000000000;
+    const LEVEL1_PRICE: u128 = LEVEL_1 * ONE_YOCTO;
 
     fn get_context(is_view: bool) -> VMContextBuilder {
         let mut builder = VMContextBuilder::new();
@@ -102,7 +111,7 @@ mod tests {
     fn get_default_metadata() -> CourseMetadata {
         CourseMetadata {
             name: "Rust".to_string(),
-            level: 10,
+            level: 1,
             luck: 1,
             start_time: 100000,
             end_time: 120000,
@@ -154,16 +163,38 @@ mod tests {
         let mut contract =
             Contract::new_default("main.l2e.testnet".to_string().try_into().unwrap());
 
-        testing_env!(
-            context.storage_usage(env::storage_usage())
+        testing_env!(context
+            .storage_usage(env::storage_usage())
             .attached_deposit(CREATE_COURSE_DEPOSIT)
-            .build()
-        );
+            .build());
 
         contract.create_course(get_default_metadata());
         assert_eq!(contract.total_courses_count(), U128(1));
         assert_eq!(contract.total_courses_for_contributor(accounts(0)), U128(1));
         assert_eq!(contract.total_courses_for_user(accounts(0)), U128(0));
+        assert_eq!(contract.total_courses_for_user(accounts(1)), U128(0));
+    }
+
+    #[test]
+    fn test_register_course() {
+        let mut context = get_context(false);
+        testing_env!(context.build());
+
+        let mut contract =
+            Contract::new_default("main.l2e.testnet".to_string().try_into().unwrap());
+
+        testing_env!(context
+            .storage_usage(env::storage_usage())
+            .attached_deposit(LEVEL1_PRICE + CREATE_COURSE_DEPOSIT)
+            .predecessor_account_id(accounts(0))
+            .signer_account_id(accounts(0))
+            .build());
+
+        contract.create_course(get_default_metadata());
+        assert_eq!(contract.total_courses_count(), U128(1));
+        assert_eq!(contract.total_courses_for_contributor(accounts(0)), U128(1));
+        contract.register_course(accounts(0), u128::from(U128(1)));
+        assert_eq!(contract.total_courses_for_user(accounts(0)), U128(1));
         assert_eq!(contract.total_courses_for_user(accounts(1)), U128(0));
     }
 }

@@ -39,19 +39,30 @@ impl Contract {
         if let Some(course) = course {
             let level = course.metadata.level;
             let price_in_near = match level {
-                1 => 5,
-                2 => 10,
-                3 => 15,
-                4 => 20,
-                5 => 25,
-                6 => 30,
-                _ => 0
+                1 => LEVEL_1,
+                2 => LEVEL_2,
+                3 => LEVEL_3,
+                4 => LEVEL_4,
+                5 => LEVEL_5,
+                6 => LEVEL_6,
+                _ => 0,
             };
+            let price_in_yocto = u128::from(U128(price_in_near * ONE_YOCTO));
+            let amount = env::attached_deposit();
+            assert!(
+                amount >= price_in_yocto,
+                "Not enough NEAR to register this course. Price of this course: {} NEAR",
+                price_in_yocto
+            );
+            if amount > price_in_yocto {
+                let refund = amount - price_in_yocto;
+                Promise::new(env::predecessor_account_id()).transfer(refund);
+            }
             self.internal_add_course_to_user(&user_id, &course);
+        } else {
+            panic!("Course doesn't exist!");
         }
     }
 
-    pub fn start_learn(&mut self, account_id: AccountId, course_id: CourseId) {
-
-    }
+    pub fn start_learn(&mut self, account_id: AccountId, course_id: CourseId) {}
 }
