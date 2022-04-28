@@ -3,7 +3,7 @@ use crate::*;
 #[near_bindgen]
 impl Contract {
     #[payable]
-    pub fn create_course(&mut self, course_metadata: CourseMetadata) {
+    pub fn create_course(&mut self, course_metadata: CourseMetadata) -> Course {
         let before_storage_usage = env::storage_usage();
 
         let contributor_id = env::predecessor_account_id();
@@ -27,6 +27,8 @@ impl Contract {
 
         let after_storage_usage = env::storage_usage();
         refund_deposit(after_storage_usage - before_storage_usage);
+
+        course
     }
 
     #[payable]

@@ -41,3 +41,9 @@ pub struct Card {
 pub struct CustomBox {
     pub cards: Vec<Card>,
 }
+
+impl Course {
+    pub fn is_ended(&self) -> bool {
+        self.metadata.end_time < env::block_timestamp()
+    }
+}

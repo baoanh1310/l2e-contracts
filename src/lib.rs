@@ -169,7 +169,7 @@ mod tests {
             .attached_deposit(CREATE_COURSE_DEPOSIT)
             .build());
 
-        contract.create_course(get_default_metadata());
+        let course = contract.create_course(get_default_metadata());
         assert_eq!(contract.total_courses_count(), U128(1));
         assert_eq!(contract.total_courses_for_contributor(accounts(0)), U128(1));
         assert_eq!(contract.total_courses_for_user(accounts(0)), U128(0));
@@ -197,5 +197,6 @@ mod tests {
         contract.register_course(accounts(0), u128::from(U128(1)));
         assert_eq!(contract.total_courses_for_user(accounts(0)), U128(1));
         assert_eq!(contract.total_courses_for_user(accounts(1)), U128(0));
+        // print!("{:?}", contract.courses_for_user(accounts(0), Some(U128(0)), Some(10)));
     }
 }
