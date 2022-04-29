@@ -4,7 +4,7 @@ use near_sdk::json_types::{Base64VecU8, U128};
 use near_sdk::serde::{Deserialize, Serialize};
 use near_sdk::{
     env, ext_contract, log, near_bindgen, AccountId, Balance, BlockHeight, EpochHeight, Gas,
-    PanicOnDefault, Promise, PromiseOrValue, PromiseResult, Timestamp,
+    PanicOnDefault, Promise, PromiseOrValue, PromiseResult, Timestamp, promise_result_as_success
 };
 
 use crate::core::*;
@@ -12,12 +12,16 @@ use crate::course::*;
 use crate::enumeration::*;
 use crate::internal::*;
 use crate::utils::*;
+use crate::ft_callback::*;
+use crate::nft_callback::*;
 
 mod core;
 mod course;
 mod enumeration;
 mod internal;
 mod utils;
+mod ft_callback;
+mod nft_callback;
 
 pub type CourseId = u128;
 
