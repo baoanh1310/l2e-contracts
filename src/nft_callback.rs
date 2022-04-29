@@ -25,7 +25,7 @@ pub trait NonFungibleToken {
 #[near_bindgen]
 impl Contract {
     pub fn nft_level_of_user(&self, account_id: AccountId) -> Promise {
-        ext_nft::nft_level_for_owner(env::predecessor_account_id(), get_nft_contract(), 0, GAS_FOR_COMMON_OPERATIONS).then(
+        ext_nft::nft_level_for_owner(account_id, get_nft_contract(), 0, GAS_FOR_COMMON_OPERATIONS).then(
             ext_self::callback_promise_result(env::current_account_id(), 0, GAS_FOR_COMMON_OPERATIONS),
         )
 
