@@ -170,7 +170,7 @@ mod tests {
 
         testing_env!(context
             .storage_usage(env::storage_usage())
-            .attached_deposit(CREATE_COURSE_DEPOSIT)
+            .attached_deposit(LEVEL2_PRICE)
             .build());
 
         let course = contract.create_course(get_default_metadata());
