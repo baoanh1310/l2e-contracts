@@ -57,7 +57,7 @@ impl Contract {
     }
 
     #[payable]
-    pub fn register_course(&mut self, account_id: AccountId, course_id: CourseId) {
+    pub fn register_course(&mut self, course_id: CourseId) {
         let user_id = env::predecessor_account_id();
         let courses = self.courses.to_vec().clone();
         let course = self.courses.iter().find(|x| x.course_id == course_id);
@@ -92,4 +92,33 @@ impl Contract {
     }
 
     pub fn start_learn(&mut self, account_id: AccountId, course_id: CourseId) {}
+
+    pub fn update_course_user(
+        &mut self,
+        account_id: AccountId,
+        course_id: CourseId,
+        contributor_id: AccountId,
+        metadata: CourseMetadata,
+    ) {
+        let mut courses_set = self.courses_by_user.get(&account_id).unwrap();
+
+        let course = courses_set
+            .iter()
+            .find(|x| x.course_id == course_id)
+            .unwrap();
+        // self.internal_remove_course_from_user(&account_id, &course);
+        courses_set.remove(&course);
+
+        let updated_course = Course {
+            contributor_id,
+            course_id,
+            metadata,
+        };
+
+        courses_set.insert(&updated_course);
+        self.courses_by_user.insert(&account_id, &courses_set);
+
+        let lng_amount = U128(10);
+        self.pay_reward_user(account_id, lng_amount);
+    }
 }

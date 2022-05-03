@@ -3,25 +3,26 @@ use near_sdk::collections::{LookupMap, UnorderedMap, UnorderedSet, Vector};
 use near_sdk::json_types::{Base64VecU8, U128};
 use near_sdk::serde::{Deserialize, Serialize};
 use near_sdk::{
-    env, ext_contract, log, near_bindgen, AccountId, Balance, BlockHeight, EpochHeight, Gas,
-    PanicOnDefault, Promise, PromiseOrValue, PromiseResult, Timestamp, promise_result_as_success
+    env, ext_contract, log, near_bindgen, promise_result_as_success, AccountId, Balance,
+    BlockHeight, EpochHeight, Gas, PanicOnDefault, Promise, PromiseOrValue, PromiseResult,
+    Timestamp,
 };
 
 use crate::core::*;
 use crate::course::*;
 use crate::enumeration::*;
-use crate::internal::*;
-use crate::utils::*;
 use crate::ft_callback::*;
+use crate::internal::*;
 use crate::nft_callback::*;
+use crate::utils::*;
 
 mod core;
 mod course;
 mod enumeration;
-mod internal;
-mod utils;
 mod ft_callback;
+mod internal;
 mod nft_callback;
+mod utils;
 
 pub type CourseId = u128;
 
@@ -122,7 +123,7 @@ mod tests {
             end_time: 120000,
             current_date: 1,
             course_type_id: 1,
-            boxes: vec![get_default_box()],
+            // boxes: vec![get_default_box()],
         }
     }
 
@@ -190,17 +191,23 @@ mod tests {
 
         testing_env!(context
             .storage_usage(env::storage_usage())
-            .attached_deposit(LEVEL2_PRICE + CREATE_COURSE_DEPOSIT)
+            .attached_deposit(LEVEL2_PRICE)
             .predecessor_account_id(accounts(0))
             .signer_account_id(accounts(0))
             .build());
 
-        contract.create_course(get_default_metadata());
-        assert_eq!(contract.total_courses_count(), U128(1));
-        assert_eq!(contract.total_courses_for_contributor(accounts(0)), U128(1));
-        contract.register_course(accounts(0), u128::from(U128(1)));
-        assert_eq!(contract.total_courses_for_user(accounts(0)), U128(1));
+        let course = contract.create_course(get_default_metadata());
+        let new_course = contract.create_course(get_default_metadata());
+        assert_eq!(contract.total_courses_count(), U128(2));
+        assert_eq!(contract.total_courses_for_contributor(accounts(0)), U128(2));
+        contract.register_course(u128::from(U128(1)));
+        contract.register_course(u128::from(U128(2)));
+        assert_eq!(contract.total_courses_for_user(accounts(0)), U128(2));
         assert_eq!(contract.total_courses_for_user(accounts(1)), U128(0));
-        // print!("{:?}", contract.courses_for_user(accounts(0), Some(U128(0)), Some(10)));
+        print!(
+            "{:#?}",
+            contract.courses_for_user(accounts(0), Some(U128(0)), Some(10))
+        );
+        // print!("{:#?}", contract.total_courses(Some(U128(0)), Some(10)));
     }
 }
